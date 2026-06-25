@@ -1,0 +1,10 @@
+=====================================
+Loan Report for member 'mehdi azad'
+Book : Great History of world | from date : 2026-05-27 | to date : 2026-05-29
+=====================================
+Loan Report for member 'carl cracker'
+Book : Great History of world | from date : 2026-05-26 | to date : 2026-05-29
+Book : core java vol 1 | from date : 2026-05-27 | to date : 2026-05-29
+=====================================
+Loan Report for member 'jack jones'
+Book : Resurrection | from date : 2026-05-26 | to date : 2026-05-28
