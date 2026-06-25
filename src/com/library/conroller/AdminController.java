@@ -39,6 +39,7 @@ public class AdminController {
         return adminService.getAllAdminService();
     }
 
+    //get admin by id
     public AdminDTO handleGetAdminById(int adminId){
         return adminService.getAdminByIdService(adminId);
     }
