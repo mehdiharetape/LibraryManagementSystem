@@ -4,8 +4,10 @@ import com.library.domain.entity.LoanBookEntity;
 import com.library.domain.entity.LoanPenaltyEntity;
 import com.library.domain.enums.LoanStatus;
 import com.library.infrastructure.persistance.CreateConnection;
+import com.library.services.DTOs.LoanBookDto;
 import com.library.services.DTOs.LoanBookListDTO;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -107,8 +109,9 @@ public class LoanBookRepository {
     }
 
     //get all loans
-    public List<LoanBookListDTO> getAllLoans(){
-        String sql = """
+    public List<LoanBookListDTO> getAllLoans(LocalDate fromDate, LocalDate toDate)
+    {
+        String noFilterSql = """
             SELECT 
             loanbooks.loan_id, loanbooks.from_date, loanbooks.to_date, loanbooks.status,
             members.member_id, members.full_name, 
@@ -119,23 +122,60 @@ public class LoanBookRepository {
             ORDER BY loanbooks.loan_id DESC
             """;
 
+        String filterSql = """
+            SELECT 
+            loanbooks.loan_id, loanbooks.from_date, loanbooks.to_date, loanbooks.status,
+            members.member_id, members.full_name, 
+            books.book_id ,books.title, books.book_status
+            FROM loanbooks
+            JOIN members ON loanbooks.member_id=members.member_id
+            JOIN books ON loanbooks.book_id_system=books.book_id
+            WHERE loanbooks.to_date BETWEEN ? AND ?
+            ORDER BY loanbooks.loan_id DESC
+            """;
+
         List<LoanBookListDTO> loans = new ArrayList<>();
-        try (PreparedStatement statement = connection.getConnection().prepareStatement(sql);
+        if(fromDate == null || toDate == null){
+            try (PreparedStatement statement = connection.getConnection().prepareStatement(noFilterSql);
                  ResultSet r = statement.executeQuery())
-        {
-            while (r.next()){
-                var loan = new LoanBookListDTO(r.getInt("loan_id"), r.getInt("member_id"),
-                        r.getString("full_name"), r.getInt("book_id"),
-                        r.getString("title"), r.getString("book_status"),
-                        LocalDate.parse(r.getString("from_date")),
-                        LocalDate.parse(r.getString("to_date")),
-                        LoanStatus.valueOf(r.getString("status")));
-                loans.add(loan);
+            {
+                while (r.next()){
+                    var loan = new LoanBookListDTO(r.getInt("loan_id"), r.getInt("member_id"),
+                            r.getString("full_name"), r.getInt("book_id"),
+                            r.getString("title"), r.getString("book_status"),
+                            LocalDate.parse(r.getString("from_date")),
+                            LocalDate.parse(r.getString("to_date")),
+                            LoanStatus.valueOf(r.getString("status")));
+                    loans.add(loan);
+                }
+                return loans;
             }
-            return loans;
+            catch (SQLException e){
+                throw new RuntimeException(e.getMessage());
+            }
         }
-        catch (SQLException e){
-            throw new RuntimeException(e.getMessage());
+        else {
+            try (PreparedStatement filterSt = connection.getConnection().prepareStatement(filterSql);)
+            {
+                filterSt.setDate(1, Date.valueOf(fromDate));
+                filterSt.setDate(2, Date.valueOf(toDate));
+                try (ResultSet rs = filterSt.executeQuery()){
+                    while (rs.next()){
+                        var loan = new LoanBookListDTO(rs.getInt("loan_id"),
+                                rs.getInt("member_id"),
+                                rs.getString("full_name"), rs.getInt("book_id"),
+                                rs.getString("title"), rs.getString("book_status"),
+                                LocalDate.parse(rs.getString("from_date")),
+                                LocalDate.parse(rs.getString("to_date")),
+                                LoanStatus.valueOf(rs.getString("status")));
+                        loans.add(loan);
+                    }
+                    return loans;
+                }
+            }
+            catch (SQLException e){
+                throw new RuntimeException(e.getMessage());
+            }
         }
     }
 
@@ -229,4 +269,5 @@ public class LoanBookRepository {
             throw new RuntimeException(e.getMessage());
         }
     }
+
 }

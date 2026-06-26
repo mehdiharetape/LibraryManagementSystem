@@ -13,6 +13,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.io.File;
 import java.time.LocalDate;
@@ -28,9 +29,11 @@ public class LoanManagementPanel extends JPanel {
     private JTable loanTable, penaltyTable;
     private DefaultTableModel tableModel, penaltyTableModel;
     //-------------------------
-    private JButton btnAddLoan, btnRefresh, btnDetails, btnToFile, btnRefreshPenalty, btnFilter;
+    private JButton btnAddLoan, btnRefresh, btnDetails, btnToFile, btnRefreshPenalty,
+            btnFilter, btnLoanFilter;
     //-------------------------
-    private JTextField searchField, searchPenaltyField, fromDateField, toDateField;
+    private JTextField searchField, searchPenaltyField,
+            fromDateField, toDateField, fromLoanField, toLoanField;
     //panels
     private JPanel northPanel, southPanel;
 
@@ -90,6 +93,7 @@ public class LoanManagementPanel extends JPanel {
         btnRefreshPenalty.addActionListener(e -> refreshPenaltyTable());
 
         btnFilter.addActionListener(e -> filterPenaltyDate());
+        btnLoanFilter.addActionListener(e -> filterLoanDate());
         btnToFile.addActionListener(e -> saveToFile(true));
 
         addFilterLogic(searchPenaltyField, false);
@@ -99,11 +103,26 @@ public class LoanManagementPanel extends JPanel {
     //loan---------------
     private JPanel createTopLoanPanel(){
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-
-        panel.add(new JLabel("search (Member ID | Member name | Book title | Status | Loan ID) : "));
+        //left search panel
+        JPanel lefPanel = new JPanel(new BorderLayout());
+        lefPanel.add(new JLabel("search (member name | book title | status | loan ID) : ")
+                ,BorderLayout.WEST);
         searchField = new JTextField(30);
-        panel.add(searchField);
+        lefPanel.add(searchField);
+        //date panel
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        rightPanel.setBorder(BorderCreator.createBorder("Date Filter(Expire date)"));
+        rightPanel.add(new JLabel("From Date : "));
+        fromLoanField = new JTextField(10);
+        rightPanel.add(fromLoanField);
+        rightPanel.add(new JLabel(" - To Date : "));
+        toLoanField = new JTextField(10);
+        rightPanel.add(toLoanField);
+        btnLoanFilter = new JButton("Filter");
+        rightPanel.add(btnLoanFilter);
 
+        panel.add(lefPanel);
+        panel.add(rightPanel);
         return panel;
     }
 
@@ -128,7 +147,7 @@ public class LoanManagementPanel extends JPanel {
 
     private void filterLoan(String query){
         tableModel.setRowCount(0);
-        List<LoanBookListDTO> loans = loanBookController.handleGetAllLoans();
+        List<LoanBookListDTO> loans = loanBookController.handleGetAllLoans(null, null);
         for(LoanBookListDTO l : loans){
             if(String.valueOf(l.getMemberId()).contains(query) ||
                     String.valueOf(l.getLoanId()).contains(query) ||
@@ -147,6 +166,8 @@ public class LoanManagementPanel extends JPanel {
                         l.getStatus()
                 };
                 tableModel.addRow(row);
+                hideColumn(loanTable, 1);
+                hideColumn(loanTable, 3);
             }
         }
     }
@@ -182,13 +203,43 @@ public class LoanManagementPanel extends JPanel {
     }
 
     private void refreshLoanTable(){
-        List<LoanBookListDTO> loans = loanBookController.handleGetAllLoans();
+        List<LoanBookListDTO> loans = loanBookController.handleGetAllLoans(null, null);
 
         //clear table data
         tableModel.setRowCount(0);
 
         if(loans != null){
             for (LoanBookListDTO l : loans){
+                Object[] row = {
+                        l.getLoanId(),
+                        l.getMemberId(),//1
+                        l.getMemberName(),
+                        l.getBookId(),//3
+                        l.getTitle(),
+                        l.getFromDate(),
+                        l.getToDate(),
+                        l.getStatus()
+                };
+                tableModel.addRow(row);
+            }
+            hideColumn(loanTable, 1);
+            hideColumn(loanTable, 3);
+        }
+    }
+
+    private void filterLoanDate(){
+        String txtLoanFrom = fromLoanField.getText();
+        String txtLoanTo = toLoanField.getText();
+        if(txtLoanFrom == null || txtLoanFrom.isEmpty() || txtLoanTo == null ||txtLoanTo.isEmpty()){
+            JOptionPane.showMessageDialog(this, "Dates Can't be empty !!!");
+        }
+        else {
+            LocalDate fromDate = LocalDate.parse(txtLoanFrom);
+            LocalDate toDate = LocalDate.parse(txtLoanTo);
+            tableModel.setRowCount(0);
+            List<LoanBookListDTO> loans =
+                    loanBookController.handleGetAllLoans(fromDate, toDate);
+            for(LoanBookListDTO l : loans){
                 Object[] row = {
                         l.getLoanId(),
                         l.getMemberId(),//1
@@ -226,7 +277,7 @@ public class LoanManagementPanel extends JPanel {
         rightPanel.add(new JLabel("From Date : "));
         fromDateField = new JTextField(10);
         rightPanel.add(fromDateField);
-        rightPanel.add(new JLabel(" | To Date : "));
+        rightPanel.add(new JLabel(" - To Date : "));
         toDateField = new JTextField(10);
         rightPanel.add(toDateField);
         btnFilter = new JButton("Filter");
@@ -332,6 +383,7 @@ public class LoanManagementPanel extends JPanel {
         }
     }
 
+    //---------------------------
     private void saveToFile(boolean isPenalty){
         String txtFrom = fromDateField.getText();
         String txtTo = toDateField.getText();

@@ -72,8 +72,9 @@ public class LoanBookService {
     }
 
     //get loans
-    public List<LoanBookListDTO> getLoansService(){
-        var loans = loanBookRepository.getAllLoans();
+    public List<LoanBookListDTO> getLoansService(LocalDate fromDate, LocalDate toDate)
+    {
+        var loans = loanBookRepository.getAllLoans(fromDate, toDate);
         if(loans == null)
             return new ArrayList<>();
         return loans;

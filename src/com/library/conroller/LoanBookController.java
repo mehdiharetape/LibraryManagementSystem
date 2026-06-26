@@ -41,8 +41,8 @@ public class LoanBookController {
     }
 
     //get all loans
-    public List<LoanBookListDTO> handleGetAllLoans(){
-        return loanBookService.getLoansService();
+    public List<LoanBookListDTO> handleGetAllLoans(LocalDate fromDate, LocalDate toDate){
+        return loanBookService.getLoansService(fromDate ,toDate);
     }
 
     //get loan by id
