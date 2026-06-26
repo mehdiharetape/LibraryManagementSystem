@@ -67,8 +67,8 @@ public class LoanBookService {
     }
 
     //check for loan time ended
-    public String checkAndExpireLoans(){
-        return loanBookRepository.updateExpiredLoans();
+    public void checkAndExpireLoans(){
+        loanBookRepository.updateExpiredLoans();
     }
 
     //get loans

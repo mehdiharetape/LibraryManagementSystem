@@ -36,8 +36,8 @@ public class LoanBookController {
     }
 
     //check loan expires
-    public String handleCheckExpiredLoan(){
-        return loanBookService.checkAndExpireLoans();
+    public void handleCheckExpiredLoan(){
+        loanBookService.checkAndExpireLoans();
     }
 
     //get all loans

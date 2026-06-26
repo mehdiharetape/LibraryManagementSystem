@@ -44,7 +44,7 @@ public class LoanBookRepository {
     }
 
     //book count increment and change loan status
-    public String updateExpiredLoans(){
+    public void updateExpiredLoans(){
         String updateStatusQuery = """
                 UPDATE loanbooks SET status = 'OVERDUE' 
                 WHERE to_date < CURRENT_DATE AND status='ACTIVE'
@@ -53,7 +53,6 @@ public class LoanBookRepository {
         try (PreparedStatement psStatus = connection.getConnection().prepareStatement(updateStatusQuery))
         {
             int affectedLoanBooks = psStatus.executeUpdate();
-            return "[DB] updated " + affectedLoanBooks +" loaned books";
         }
         catch (SQLException e){
             throw new RuntimeException(e.getMessage());

@@ -156,20 +156,4 @@ public class ReportRepository {
         }
     }
 
-    public static void main(String[] args){
-        var data = new ReportRepository(CreateConnection.getInstance());
-        var all = data.getAllPenalties(null, null);
-        for (PenaltyReportDTO pa : all)
-            System.out.println(pa.getLoanId() + "-" + pa.getBookTitle() + "-" + pa.getExpireDate() +
-                    "-return date : " + pa.getReturnDate() + "-" + pa.getMemberName() +
-                    "-"+ pa.getLateDays());
-
-        System.out.println("-------------------------");
-        var filtered = data.getAllPenalties(LocalDate.of(2026,6,24),
-                LocalDate.of(2026, 6, 25));
-        for (PenaltyReportDTO pa : filtered)
-            System.out.println(pa.getLoanId() + "-" + pa.getBookTitle() + "-" + pa.getExpireDate() +
-                    "-return date : " + pa.getReturnDate() + "-" + pa.getMemberName() +
-                    "-"+ pa.getLateDays());
-    }
 }
