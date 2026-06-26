@@ -1,6 +1,0 @@
-Report at 2026-05-28T23:15:03.919593
-id:300 | title:core java vol 1 | total:5 | in shelve:4 | in loan:1
-id:301 | title:java network programming | total:4 | in shelve:4 | in loan:0
-id:302 | title:Great History of world | total:2 | in shelve:0 | in loan:2
-id:306 | title:Resurrection | total:3 | in shelve:2 | in loan:1
-id:307 | title:Persian Literature | total:2 | in shelve:2 | in loan:0
