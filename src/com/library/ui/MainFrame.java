@@ -75,7 +75,7 @@ public class MainFrame extends JFrame
         this.connection = connection;
 
         setTitle("Library Management System");
-        setSize(1000,600);
+        setSize(1200,600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());

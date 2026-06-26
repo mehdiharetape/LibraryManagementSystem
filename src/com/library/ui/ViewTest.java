@@ -129,8 +129,8 @@ public class ViewTest {
 //             System.out.println("author name : " + a);
 //
 //         //inventory report to file
-//         //report.handleActiveLoanToFile("active_loan.txt");
-//         //report.handleInventoryToFile("inventory_report.txt");
+//
+//
 //
 //         //search
 //         String keyWord = "prog";
